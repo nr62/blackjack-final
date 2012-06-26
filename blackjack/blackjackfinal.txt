@@ -1,0 +1,123 @@
+// Card Constructor
+function Card (suitnum, ranknum) {
+    var suit = suitnum;
+    var rank = ranknum;
+    this.getSuit = function() {
+        return suit;
+    };
+    this.getRank = function() {
+        return rank;
+    };
+    this.getValue = function() {
+        if (rank > 9) {
+            return 10;
+        } else if (rank === 1) {
+            return 11;
+        } else {
+            return rank;
+        }
+    };
+}
+
+//random deal
+function deal() {
+    var newSuit = Math.floor(Math.random() * 4 + 1);
+    var newRank = Math.floor(Math.random() * 13 + 1);
+    return new Card(newSuit, newRank);
+}
+
+//Hand constructor
+function Hand() {
+    var cards = [];
+    cards[0] = deal();
+    cards[1] = deal();
+    this.getHand = function() {
+        return cards;
+    };
+    //calculate score for hand
+    this.score = function() {
+        var handValue;
+        var aceCount;
+        for (i = 0; i < cards.length; i++) {
+        if (Card.getValue() === 11) {
+            aceCount++;
+        }
+        handValue += Card.getValue();
+        }
+        if (handValue > 21 && aceCount > 0) {
+            handValue -= (aceCount * 11);
+            handValue += aceCount;
+        }
+    };
+    //return contents of hand
+    this.printHand = function() {
+        var handStatement = "";
+        for (i = 0; i < cards.length; i++) {
+            handStatement = handStatement + cards[i].getRank() + " of " +cards[i].getSuit();
+            if (i < cards.length - 1) {
+               handStatement += ", and the ";
+            } else {
+                handStatement += ".";
+            }
+        }
+        return handStatement;
+    };
+    //add new card to array
+    this.hitMe = function() {
+        cards.push(deal());
+    };
+}
+
+//computer play
+function playAsDealer() {
+    var hand = new Hand();
+    if (hand.score < 17) {
+        hand.hitMe();
+    }
+    return hand;
+}
+
+//user play
+function playAsUser() {
+    var hand = new Hand();
+    var hitCheck = confirm("Your hand holds the " + hand.printHand() + " Do you want to hit?");
+    while(hitCheck === true) {
+        hand.hitMe();
+        hitCheck = confirm("Your hand holds the " + hand.printHand() + " Do you want to hit again?");
+    }
+    return hand;
+}
+
+//determine winner
+function declareWinner(userHand, dealerHand) {
+    var userScore = userHand.score();
+    var dealerScore = dealerHand.score();
+    if (userScore === dealerScore) {
+        return "You tied!";
+    } 
+    else if (userScore > dealerScore) {
+        if (userScore > 21) {
+            return "You lost!";
+        } else {
+            return "You won!";
+        }
+    } 
+    else if (userScore < dealerScore) {
+        if (dealerScore > 21) {
+            return "You won!";
+        } else {
+            return "You lost!";
+        }
+    }
+}
+
+//simplify
+function playGame() {
+    var user = playAsUser();
+    var dealer =  playAsDealer();
+    var computerHand = alert("The dealer's hand holds the " +dealer.printHand());
+    alert("Your hand holds the " + user.printHand());
+    console.log(declareWinner());
+}
+
+playGame();
